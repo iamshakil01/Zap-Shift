@@ -1,11 +1,23 @@
 import React from 'react';
 import { useForm, useWatch } from 'react-hook-form';
-import { useLoaderData } from 'react-router';
+import { useLoaderData, useNavigate } from 'react-router';
 import Swal from 'sweetalert2';
+import useAxiosSecure from '../../hooks/useAxiosSecure';
+import useAuth from '../../hooks/useAuth';
 
 const SendParcel = () => {
 
-    const { register, handleSubmit, control, formState: { errors } } = useForm();
+    const {
+        register,
+        handleSubmit,
+        control,
+        // formState: { errors }
+    } = useForm();
+
+    const { user } = useAuth()
+    const axiosSecure = useAxiosSecure();
+    const navigate = useNavigate();
+
     const serviceCenters = useLoaderData();
     const regionsDuplicates = serviceCenters.map(c => c.region);
     const regions = [...new Set(regionsDuplicates)];
@@ -41,7 +53,8 @@ const SendParcel = () => {
             }
         }
 
-        console.log(cost)
+        data.cost = cost;
+
         Swal.fire({
             title: "Are you agree with the cost?",
             text: `You will be charged ${cost} taka !`,
@@ -52,11 +65,23 @@ const SendParcel = () => {
             confirmButtonText: "Yes,"
         }).then((result) => {
             if (result.isConfirmed) {
-                // Swal.fire({
-                //     title: "Deleted!",
-                //     text: "Your file has been deleted.",
-                //     icon: "success"
-                // });
+
+
+                // save the parcel info in the database
+                axiosSecure.post('/parcels', data)
+                    .then(res => {
+                        console.log('after saving parcel', res.data);
+                        if (res.data.insertedId) {
+                            navigate('/dashboard/my-parcels')
+                            Swal.fire({
+                                position: "top-end",
+                                icon: "success",
+                                title: "Your Parcel Has Created. Please Pay Now!",
+                                showConfirmButton: false,
+                                timer: 2500
+                            });
+                        }
+                    })
             }
         });
 
@@ -106,6 +131,7 @@ const SendParcel = () => {
                         <fieldset className="fieldset">
                             <label className="label">Sender Name</label>
                             <input type="text" {...register('senderName')}
+                                defaultValue={user?.displayName}
                                 className="input w-full" placeholder="Sender Name" />
                         </fieldset>
 
@@ -113,6 +139,7 @@ const SendParcel = () => {
                         <fieldset className="fieldset">
                             <label className="label">Sender Email</label>
                             <input type="text" {...register('senderEmail')}
+                                defaultValue={user?.email}
                                 className="input w-full" placeholder="Sender Email" />
                         </fieldset>
 
