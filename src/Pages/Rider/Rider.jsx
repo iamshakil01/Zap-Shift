@@ -3,6 +3,7 @@ import { useForm, useWatch } from 'react-hook-form';
 import useAuth from '../../hooks/useAuth';
 import useAxiosSecure from '../../hooks/useAxiosSecure';
 import { useLoaderData } from 'react-router';
+import Swal from 'sweetalert2';
 
 const Rider = () => {
     const { register,
@@ -29,7 +30,18 @@ const Rider = () => {
 
 
     const handleRiderApplication = (data => {
-        console.log(data);
+        axiosSecure.post('/riders', data)
+            .then(res => {
+                if (res.data.insertedId) {
+                    Swal.fire({
+                        position: "top-end",
+                        icon: "success",
+                        title: "Your Application Has Been Submitted!",
+                        showConfirmButton: false,
+                        timer: 2500
+                    });
+                }
+            })
     })
 
 
@@ -57,24 +69,18 @@ const Rider = () => {
                         {/* Rider Email */}
                         <fieldset className="fieldset">
                             <label className="label">Email</label>
-                            <input type="text" {...register('Email')}
+                            <input type="text" {...register('email')}
                                 defaultValue={user?.email}
                                 className="input w-full" placeholder="Sender Email" />
                         </fieldset>
 
                         {/* Address */}
                         <fieldset className="fieldset">
-                            <label className="label">Your Address</label>
+                            <label className="label">Address</label>
                             <input type="text" {...register('address')}
                                 className="input w-full" placeholder="Address" />
                         </fieldset>
 
-                        {/* Phone Number */}
-                        <fieldset className="fieldset">
-                            <label className="label">Sender Phone Number</label>
-                            <input type="text" {...register('phoneNumber')}
-                                className="input w-full" placeholder="Phone Number" />
-                        </fieldset>
 
                         {/* Region */}
                         <fieldset className="fieldset">
@@ -102,26 +108,17 @@ const Rider = () => {
                     </div>
 
 
-
-
-
-                    {/* receiver info */}
+                    {/* More Information */}
                     <div>
                         <h2 className='text-2xl font-semibold'>More Details</h2>
 
-                        {/* Receiver Name */}
+                        {/* Driving License */}
                         <fieldset className="fieldset">
                             <label className="label">Driving License</label>
                             <input type="text" {...register('license')}
                                 className="input w-full" placeholder="Driving License" />
                         </fieldset>
 
-                        {/* Receiver Email */}
-                        <fieldset className="fieldset">
-                            <label className="label">NID</label>
-                            <input type="text" {...register('ReceiverEmail')}
-                                className="input w-full" placeholder="NID" />
-                        </fieldset>
 
                         {/* Bike Info */}
                         <fieldset className="fieldset">
@@ -130,9 +127,17 @@ const Rider = () => {
                                 className="input w-full" placeholder="Bike Info" />
                         </fieldset>
 
+
+                        {/* NID */}
+                        <fieldset className="fieldset">
+                            <label className="label">NID</label>
+                            <input type="text" {...register('nid')}
+                                className="input w-full" placeholder="Nid" />
+                        </fieldset>
+
                         {/* Phone Number */}
                         <fieldset className="fieldset">
-                            <label className="label">Sender Phone Number</label>
+                            <label className="label">Phone Number</label>
                             <input type="text" {...register('phoneNumber')}
                                 className="input w-full" placeholder="Phone Number" />
                         </fieldset>
