@@ -3,6 +3,7 @@ import React from 'react';
 import useAxiosSecure from '../../../hooks/useAxiosSecure';
 import { FaTrashCan, FaUserCheck } from 'react-icons/fa6';
 import { IoPersonRemoveSharp } from "react-icons/io5";
+import { MdPreview } from "react-icons/md";
 import Swal from 'sweetalert2';
 
 const ApproveRiders = () => {
@@ -15,9 +16,9 @@ const ApproveRiders = () => {
         }
     })
 
-    const updateRiderStatus = (id, status) => {
-        const updateInfo = { status: status }
-        axiosSecure.patch(`/riders/${id}`, updateInfo)
+    const updateRiderStatus = (rider, status) => {
+        const updateInfo = { status: status, email: rider.email }
+        axiosSecure.patch(`/riders/${rider._id}`, updateInfo)
             .then(res => {
                 if (res.data.modifiedCount) {
                     refetch();
@@ -32,12 +33,12 @@ const ApproveRiders = () => {
             })
     }
 
-    const handleApproval = id => {
-        updateRiderStatus(id, 'Approved')
+    const handleApproval = rider => {
+        updateRiderStatus(rider, 'approved')
     }
 
-    const handleRejection = (id) => {
-        updateRiderStatus(id, 'Rejected')
+    const handleRejection = (rider) => {
+        updateRiderStatus(rider, 'rejected')
     }
 
     return (
@@ -67,11 +68,15 @@ const ApproveRiders = () => {
                                     <p className={`${rider.status === 'approved' ? 'text-green-700' : 'text-red-700'}`}>{rider.status}</p></td>
                                 <td>{rider.district}</td>
                                 <td>
-                                    <button onClick={() => handleApproval(rider._id)} className='btn'><FaUserCheck></FaUserCheck></button>
+                                    <button onClick={() => handleApproval(rider)} className='btn'><FaUserCheck></FaUserCheck></button>
 
                                     <button className='btn mx-5'><FaTrashCan></FaTrashCan></button>
 
-                                    <button onClick={() => handleRejection(rider._id)} className='btn'> <IoPersonRemoveSharp /> </button>
+
+                                    <button className='btn mx-5'><MdPreview /></button>
+
+
+                                    <button onClick={() => handleRejection(rider)} className='btn'> <IoPersonRemoveSharp /> </button>
                                 </td>
                             </tr>)
                         }
